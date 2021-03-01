@@ -1,0 +1,9 @@
+1. The virtual ram has 1024 bytes by default.
+2. The virtual machine has registers reg0, reg1, reg2, and pc, a program counter register.
+3. The JLZ (jump less than) command takes 1 argument, a register, and will test if that register is less than zero. 
+4. The CPU checks for interrupts on line 90 of cpu.py, in the _run_program() loop after parsing any instructions.\
+5. The Monitor S instruction shows memory from the specified start value to the specified end value.
+6. The Monitor ! instruction toggles debug mode on/off.
+7. Assembly files can contain comments and blank lines. 
+8. The mov instruction is called to write bytes into memory.
+9. Raw assembly programs like this do assume they are stored at a specific memory location.
