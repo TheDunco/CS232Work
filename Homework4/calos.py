@@ -1,3 +1,9 @@
+"""
+Context switching assignment
+Duncan Van Keulen
+Victor Norman CS 232
+3/13/2021
+"""
 
 DEFAULT_QUANTUM = 3   # very short -- for pedagogical reasons.
 
@@ -44,27 +50,59 @@ class CalOS:
             print("Num ready processes = {}".format(len(self._ready_q)))
 
     def timer_isr(self):
-        '''Called when the timer expires. If there is no process in the
-        ready queue, reset the timer and continue.  Else, context_switch.
+        '''Called when the timer expires. If the ready q is not empty, conext switch.
+        Then reset the timer (always)
         '''
-        pass
+        self.current_proc.set_registers(self._cpu.get_registers)
+
+        # only context switch if there is something waiting on the ready q
+        if len(self._ready_q) != 0:
+            self.context_switch()
+        self.reset_timer()
 
     def context_switch(self):
         '''Do a context switch between the current_proc and the process
         on the front of the ready_q.
         '''
-        pass
+        # pop the next process off the ready q
+        new_pcb = self._ready_q.pop()
+
+        if self._debug:
+            print("\n/\\/\\/\\\n","Context switching from", self.current_proc.get_name(), "to", new_pcb.get_name(), "\n\\/\\/\\/\n")
+
+        # save the current registers to the current pcb
+        self.current_proc.set_registers(self._cpu.get_registers())
+        # set the cpu registers to the new pcb's registers
+        self._cpu.set_registers(new_pcb.get_registers())
+        # add currently running process to the ready q
+        self.add_to_ready_q(self.current_proc)
+        # set the new pcb to running
+        new_pcb.set_state("RUNNING")
+        # set the currently running process to the new pcb from the ready q
+        self.current_proc = new_pcb
 
     def run(self):
         '''Startup the timer controller and execute processes in the ready
         queue on the given cpu -- i.e., run the operating system!
         '''
-        pass
+        while len(self._ready_q) > 0:
+            # start the first process on the ready q running
+            self.current_proc = self._ready_q.pop()
+            self.reset_timer()
+            self._cpu.set_registers(self.current_proc.get_registers())
+            # run process on the cpu
+            self._cpu.run_process()
+            # once that's done, set the state to done
+            self.current_proc.set_state("DONE")
+
+            if self._debug:
+                print("Setting", self.current_proc.get_name(), "to done")
 
     def reset_timer(self):
         '''Reset the timer's countdown to the value in the current_proc's
         PCB.'''
-        self._timer_controller.set_countdown(CalOS.current_proc.get_quantum())
+        # had to change from calos to self.current_proc.get_quantum()
+        self._timer_controller.set_countdown(self.current_proc.get_quantum())
         
 
 

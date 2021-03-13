@@ -1,3 +1,10 @@
+"""
+Context switching assignment
+Duncan Van Keulen
+Victor Norman CS 232
+3/13/2021
+"""
+
 RAM_SIZE = 1024
 
 

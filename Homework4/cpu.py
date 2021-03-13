@@ -1,3 +1,10 @@
+"""
+Context switching assignment
+Duncan Van Keulen
+Victor Norman CS 232
+3/13/2021
+"""
+
 import time
 import threading   # for CPU
 

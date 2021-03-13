@@ -1,3 +1,10 @@
+"""
+Context switching assignment
+Duncan Van Keulen
+Victor Norman CS 232
+3/13/2021
+"""
+
 '''Devices that interact with the CPU: I/O ports, timer, etc.'''
 
 import threading
