@@ -1,8 +1,10 @@
 1. The PCB class is defined at the end of calos.py
-3. It defines the possible states, the pid, the registers, the quantum (how long process runs), the name, and the next PID.
-4. In main.py, line 177 defines a new PCB and creates it in line 180.
-5. The pre-defined process states are NEW, READY, RUNNING, WAITING, and DONE.
+2. It defines the possible states, the pid, the registers, the quantum (how long process runs), the name, and the next PID.
+3. In main.py, line 177 defines a new PCB and creates it in line 180.
+4. The pre-defined process states are NEW, READY, RUNNING, WAITING, and DONE.
+5. It's first defined in line 7 of calos.py, and referenced in the 
 6. The code waits until it has the MutEx lock in order to run (it is a critical section). 
     The with statement will handle the lock (taking it, giving it when done). 
     Basically, it ensures that it it cleans up after itself like a "using" statement in C# (which I have used a lot).
 7. Basically, it's a critical section (interrupt) so the CPU takes over the MutEx lock to handle it and releases the lock when it's done.
+    This class is handling the time each process has on the CPU and when the time gets to zero it generates and handles an interrupt as a critical section.
