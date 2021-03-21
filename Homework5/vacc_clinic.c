@@ -2,6 +2,8 @@
  * Your info here.
  */
 
+// TODO: Something is wrong with buffer stuff (client 1 assigned to station 0...);
+
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdio.h>
@@ -55,10 +57,9 @@ int consumeFromStationAssignmentQ() {
 
 void initBuffer(bounded_buffer_t* buff) {
     buff->next_in = buff->next_out = buff->count = 0;
-    sem_init(&buffMutexSem, 0, 0);
-    sem_init(&empty, 0, 1);
+    sem_init(&empty, 0, NUM_STATIONS);
     sem_init(&full, 0, 0);
-
+    sem_init(&buffMutexSem, 0, 1);
 }
 
 int get_rand_in_range(int lower, int upper) {
@@ -79,7 +80,7 @@ void waitSeconds(int microseconds) {
     usleep(microseconds * 1000000);
 }
 
-// lower and upper are in seconds.
+// lower and upper are in microseconds.
 void walk(int lower, int upper) {
     waitSeconds(get_rand_in_range(lower, upper));
 }
@@ -167,7 +168,7 @@ void *client(void *arg) {
         walk(3, 10);
 
     sem_post(&registrationDeskSem);
-    fprintf(stderr, "%s: client %ld is registered and waiting to get vaccinated...\n", curr_time_s(), id);
+    fprintf(stderr, "%s: client %ld is registered and waiting to be assigned a station...\n", curr_time_s(), id);
 
 
     /* Station Assignment */
@@ -181,15 +182,17 @@ void *client(void *arg) {
                 int station = consumeFromStationAssignmentQ();
             sem_post(&buffMutexSem);
     sem_post(&empty);
-    fprintf(stderr, "%s: client %ld has been assigned to station %d\n", curr_time_s(), id, station);
+    fprintf(stderr, "%s: client %ld has been assigned to station %d!\n", curr_time_s(), id, station);
 
 
     /* Get vaccinated! */
+    fprintf(stderr, "%s: client %ld is walking to station %d\n", curr_time_s(), id, station);
     // walk to nurses station
     if (WALK_DELAYS)
         walk(1, 2);
     
     sem_post(&vaccinationReadySemArray[station]); // post to the nurse that you're ready for the vaccination
+    fprintf(stderr, "%s: client %ld is sitting down, getting vaccinated...\n", curr_time_s(), id);
     sem_wait(&vaccinationCompleteSemArray[station]); // wait for vaccination to complete
 
     /* Leave */
@@ -201,21 +204,19 @@ void *client(void *arg) {
 int main() {
     srand(time(0));
 
-    // initialize semaphores
+    // initialize semaphores and semaphore arrays
     sem_init(&clientReadySem, 0, 0);
     sem_init(&registrationDeskSem, 0, NUM_REGISTRATIONS_SIMULTANEOUSLY);
     sem_init(&numVialsSem, 0, 1);
 
-    sem_init(&empty, 0, NUM_STATIONS);
-    sem_init(&full, 0, 0);
-    sem_init(&buffMutexSem, 0, 1);
+    initBuffer(&nurseStations);
 
     for (int i = 0; i < NUM_STATIONS; i++) {
         sem_init(&vaccinationCompleteSemArray[i], 0, 0);
         sem_init(&vaccinationReadySemArray[i], 0, 0);
     }
 
-
+    // initialize client and nurse threads
     pthread_t clientThread;
     pthread_t nurseThread;
 
