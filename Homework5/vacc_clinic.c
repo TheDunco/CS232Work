@@ -2,8 +2,6 @@
  * Your info here.
  */
 
-// TODO: Something is wrong with buffer stuff (client 1 assigned to station 0...);
-
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdio.h>

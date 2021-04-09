@@ -21,14 +21,14 @@ void Shell::run()
         // get the line the user enters and send it to the CommandLine
         CommandLine commline = CommandLine(cin);
 
-        // Check if there are actually arguments.
+        // Loop back if there are no command line arguments
         if(commline.getArgCount() <= 0) {
             continue;
         }
         // grab the command which should be the first string of the vector
         string argZero = commline.getArgVector(0);
 
-        // "switch" based on the command and execute command if in shell. OTherwise fork and run from path
+        // "switch" based on the command and execute command if in shell. Otherwise fork and run from path
         if (argZero == "cd")
         {
             // change directories to the directory if it exists
