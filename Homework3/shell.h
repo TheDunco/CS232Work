@@ -25,4 +25,6 @@ public:
 private:
     Prompt prompt;
     void cd(const char* str);
+    void ForkChild(CommandLine& commline, string& argZero);
+    void RunFromPath(CommandLine& commline, string& argZero);
 };
