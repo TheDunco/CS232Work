@@ -43,8 +43,12 @@ CommandLine::CommandLine(istream &in)
         // check if word is an ampersand and only proceed if it isn't
         if (word == "&") 
         {
-            ampersandSeen = true;
+            if (tempArgv.size() >= 1)
+                ampersandSeen = true;
+            else
+                cout << "'&' must not come first" << endl;
         }
+        // make sure to handle spaces and newlines
         else if (word != " " && word != "\n")
         {
             tempArgv.push_back(word);

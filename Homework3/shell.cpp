@@ -63,9 +63,7 @@ void Shell::run()
             else if (pid > 0)
             {
                 int status;
-                // wait for child if ampersand...
-                // this seems backwards to me but it works like this
-                // to be clear, we only wait for the child if there WAS and ampersand.
+                // wait for child if ampersand
                 if (commline.noAmpersand()) {
                     waitpid(pid, &status, 0);
                 }
