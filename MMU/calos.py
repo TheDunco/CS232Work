@@ -1,3 +1,11 @@
+############################
+# calos.py for Calos
+# Created by Victor Norman
+# Edited by Duncan Van Keulen
+#   on 4/18/2021
+#   for MMU assignment
+############################
+
 import threading
 
 DEFAULT_QUANTUM = 3   # very short -- for pedagogical reasons.

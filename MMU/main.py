@@ -1,3 +1,10 @@
+############################
+# main.py for Calos
+# Created by Victor Norman
+# Edited by Duncan Van Keulen
+#   on 4/18/2021
+#   for MMU assignment
+############################
 import calos
 from cpu import CPU, MAX_CHARS_PER_ADDR
 from ram import RAM

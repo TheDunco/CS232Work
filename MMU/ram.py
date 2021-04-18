@@ -1,3 +1,11 @@
+############################
+# ram.py for Calos
+# Created by Victor Norman
+# Edited by Duncan Van Keulen
+#   on 4/18/2021
+#   for MMU assignment
+############################
+
 RAM_SIZE = 1024
 
 
