@@ -183,6 +183,9 @@ class Monitor:
                 if self._debug:
                     print("Created PCB for process {}".format(procname))
                 addr = startaddr
+
+                # Store the low memory value into the pcb
+                pcb.set_low_mem(addr)
                 for line in f:
                     line = line.strip()
                     if line == '':
@@ -195,6 +198,12 @@ class Monitor:
                         addr += 1
                     elif line.startswith("__main:"):
                         self._handle_main_label(addr, line, pcb)
+                        if self._debug:
+                            print('Found main label')
+                    elif line.startswith("__data:"):
+                        self._handle_data_label(addr, line, pcb)
+                        if self._debug:
+                            print('Found data label')
                     else:   # the line is regular code: store it in ram
                         self._ram[addr] = line
                         addr += 1
@@ -227,10 +236,14 @@ class Monitor:
         """
         if len(line.split()) != 2:
             raise ValueError("Illegal format: __data: must be followed by a value indicating how much space must be reserved for the program to store data.")
+        
+        # calculate and set the high memory of the pcb
         data_len = int(line.split()[1])
-        pcb.set_high_mem(data_len) # TODO: Have to make this compute the high memory location?
+        high_mem = pcb.get_low_mem() + data_len
+        pcb.set_high_mem(high_mem)
+
         if self._debug:
-            print("__data found at physical location", addr)
+            print("__data found at physical location", addr, ". High mem of pcb set to", high_mem)
 
     def _write_program(self, startaddr, endaddr, tapename):
         '''Write memory from startaddr to endaddr to tape (a file).'''
