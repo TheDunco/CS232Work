@@ -63,6 +63,8 @@ class CalOS:
             # Required of all ISRs: restore the registers before returning
             # (if no context switch)
             cpu.set_registers(self._current_proc[cpu.get_num()].get_registers())
+            # set the mmu registers
+            #self.set_mmu_registers(cpu, self._current_proc)
             return
 
         self.context_switch(cpu)
@@ -103,6 +105,8 @@ class CalOS:
 
         old_proc.set_registers(cpu.get_registers())
         cpu.set_registers(new_proc.get_registers())
+        # set the mmu registers
+        self.set_mmu_registers(cpu, new_proc)
 
         self.add_to_ready_q(old_proc)
         new_proc.set_state(PCB.RUNNING)
@@ -113,6 +117,13 @@ class CalOS:
         '''Reset the timer's countdown to the value in the current_proc's
         PCB.'''
         cpu.reset_timer(self._current_proc[cpu.get_num()].get_quantum())
+
+    def set_mmu_registers(self, cpu, pcb):
+        cpu._mmu.set_limit_register(pcb.get_high_mem())
+        cpu._mmu.set_reloc_register(pcb.get_low_mem())
+        if self._debug: 
+            print("Set MMU registers to reloc: {} and limit: {}".format(cpu._mmu.get_reloc_register(), cpu._mmu.get_limit_register()))
+        
 
     def run(self):
         '''Execute processes in the ready queue on all cpus --
@@ -167,6 +178,8 @@ class CalOS:
         self._current_proc[cpu.get_num()] = new_proc
         self.reset_timer(cpu)
         cpu.set_registers(new_proc.get_registers())
+        # set mmu registers 
+        self.set_mmu_registers(cpu, new_proc)
         new_proc.set_state(PCB.RUNNING)
 
 class PCB:

@@ -239,7 +239,7 @@ class Monitor:
         
         # calculate and set the high memory of the pcb
         data_len = int(line.split()[1])
-        high_mem = pcb.get_low_mem() + data_len
+        high_mem = addr + data_len
         pcb.set_high_mem(high_mem)
 
         if self._debug:
