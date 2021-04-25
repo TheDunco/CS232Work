@@ -26,7 +26,7 @@ public class CaesarCipherClient {
             Socket socket = new Socket(host, port);
 
             // Initialize in and out to read from and write to the socket
-            PrintWriter out = new PrintWriter( socket.getOutputStream() );
+            PrintStream out = new PrintStream( socket.getOutputStream() );
             BufferedReader in = new BufferedReader( new InputStreamReader( socket.getInputStream() ));
 
             // Initialize a scanner to grab input from the user
@@ -39,13 +39,20 @@ public class CaesarCipherClient {
             // Grab the rotation number from the user
             try {
                 rotationNumber = input.nextInt();
+
             }
             catch (InputMismatchException ime) {
                 System.out.println("Invalid input: please enter an integer");
-                System.exit(1);
+
+                input.close();
+                in.close();
+                out.close();
+                socket.close();
+
+                throw ime;
             }
 
-            System.out.println("Thanks!");
+            System.out.println("Thanks! Rotation number entered: " + rotationNumber);
 
             // Attempt to contact the server with that rotation number
             out.print(rotationNumber);
@@ -54,7 +61,7 @@ public class CaesarCipherClient {
             // Wait for the server's response and respond appropriately
             int response = 0;
             try { 
-                response = in.read();
+                response = Integer.parseInt(in.readLine());
             }
             catch(java.io.IOException e) {
                 System.out.println(e);
