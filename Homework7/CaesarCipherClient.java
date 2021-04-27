@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
@@ -43,7 +44,7 @@ public class CaesarCipherClient {
             // Initialize a scanner to grab input from the user
             this.userInput = new Scanner(System.in);
         } 
-        catch( Exception e ) {
+        catch(Exception e) {
             e.printStackTrace();
         }
     }
@@ -52,43 +53,85 @@ public class CaesarCipherClient {
         try {
             System.out.print("Welcome to the CaesarCipherClient! \nEnter your rotation number: ");
     
-            int rotationNumber = 0;
-    
-            // Grab the rotation number from the user
-            try {
-                rotationNumber = this.userInput.nextInt();
-    
-            }
-            catch (InputMismatchException ime) {
-                System.out.println("Invalid input: please enter an integer");
-    
-                this.closeAll();
-    
-                throw ime;
-            }
-    
-            System.out.println("Thanks! Rotation number entered: " + rotationNumber);
-    
-            // Attempt to contact the server with that rotation number
-            socketWriter.println(rotationNumber);
-            System.out.println("Attempting to contact server...");
-    
-            // Wait for the server's response and respond appropriately
-            int response = 0;
-            try { 
-                response = Integer.parseInt(socketReader.readLine());
-            }
-            catch(java.io.IOException e) {
-                System.out.println(e);
-            }
-    
-            System.out.println("Got response: " + response);
+            this.establishConnectionWithRotationNumber();
+
+            this.loopUntilQuit();
     
             this.closeAll();
+
+            // exit normally
+            System.exit(0);
         }
         catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void establishConnectionWithRotationNumber() {
+        int rotationNumber = 0;
+    
+        // Grab the rotation number from the user
+        try {
+            rotationNumber = this.userInput.nextInt();
+
+        }
+        catch (InputMismatchException ime) {
+            System.out.println("Invalid input: please enter an integer");
+
+            this.closeAll();
+
+            throw ime;
+        }
+
+        System.out.println("Thanks! Rotation number entered: " + rotationNumber);
+
+        // Attempt to contact the server with that rotation number
+        socketWriter.println(rotationNumber);
+        System.out.println("Attempting to contact server...");
+
+        // Wait for the server's response and respond appropriately
+        int response = 0;
+        try { 
+            response = Integer.parseInt(socketReader.readLine());
+        }
+        catch(java.io.IOException e) {
+            System.out.println(e);
+        }
+
+        System.out.println("Got response: " + response);
+    }
+
+    private void loopUntilQuit() {
+        
+        String message = "";
+        String response;
+
+            while(true) {
+                // get input from user
+                System.out.print("Message: ");
+                message = this.userInput.nextLine();
+    
+                if(message.toLowerCase().equals("quit")) {
+                    break;
+                }
+    
+                // send message to server
+                socketWriter.println(message);
+    
+                try {
+                    // read response from server
+                    response = socketReader.readLine();
+                }
+                catch (IOException e) { 
+                    e.printStackTrace(); 
+                    response = "error";
+                }
+                
+                // display server response
+                System.out.println("Ciphered Response: " + response);
+            } 
+
+        return;
     }
 
     // Close all open sockets/readers/writers to avoid leaks
