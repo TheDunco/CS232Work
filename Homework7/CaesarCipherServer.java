@@ -39,6 +39,8 @@ public class CaesarCipherServer extends Thread {
 
     @Override
     public void run() {
+
+        // Continually wait for new connections and spawn a request handler thread for every new connection
         running = true;
         while( running )
         {
@@ -113,35 +115,61 @@ class RequestHandler extends Thread
             BufferedReader in = new BufferedReader( new InputStreamReader( socket.getInputStream() ) );
             PrintWriter out = new PrintWriter( socket.getOutputStream() );
 
-            // Echo back the rotationNumber we recieved
-            int rotationNumber = Integer.parseInt(in.readLine());
-            out.println(rotationNumber);
+            String rotationNumberString = null;
+            int rotationInt = 0;
+
+            // Make sure we get a number and follow the protocol for establishing a correct rotation number
+            while(rotationNumberString == null) {
+                try {
+                    rotationNumberString = in.readLine();
+                    rotationInt = Integer.parseInt(rotationNumberString);
+
+                    // Make sure rotation number is positive
+                    if (rotationInt <= 0 || rotationInt >= 25) {
+                        out.println("Please enter a rotation number in the range 1..25");
+                        out.flush();
+
+                        rotationNumberString = null;
+                        rotationInt = 0;
+
+                        continue;
+                    }
+                }
+                catch (Exception e) {
+                    out.println("Silly, that's not valid a number... Try again");
+                    out.flush();
+
+                    rotationNumberString = null;
+                }
+            }
+
+            // Echo back the valid rotationNumber we inevitably recieved
+            out.println(rotationNumberString);
             out.flush();
 
             String stringToCipher = "";
             String cipheredString = "";
 
+            // continue ciphering any further messages
             try {
                 while(socket.isConnected())
                 {
                     stringToCipher = in.readLine();
 
-                    cipheredString = CaesarCipher(stringToCipher, rotationNumber);
+                    cipheredString = CaesarCipher(stringToCipher, rotationInt);
 
                     out.println(cipheredString);
                     out.flush();
                 }
             }
-            catch(NullPointerException e) {
-                
-            }
+            catch(NullPointerException e) { }
 
-            // Close our connection
+            // Close the connection
             in.close();
             out.close();
             socket.close();
 
-            System.out.println( "CaesarCipherServer connection establsihed " + stringDate + " closed" );
+            System.out.println( "CaesarCipherServer connection establsihed " + stringDate + " has been closed" );
         }
         catch( Exception e )
         {
@@ -153,7 +181,7 @@ class RequestHandler extends Thread
     // https://examples.javacodegeeks.com/caesar-cipher-java-example/#:~:text=It%20is%20a%20type%20of,to%20communicate%20with%20his%20generals.
     private String CaesarCipher(String stringToCipher, int rotationNumber) {
         StringBuffer result = new StringBuffer();
- 
+
         for (int i = 0; i < stringToCipher.length(); i++) {
             
             // uppercase character, map to uppercase characters
