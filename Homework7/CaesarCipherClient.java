@@ -111,7 +111,7 @@ public class CaesarCipherClient {
                 System.out.print("Message: ");
                 message = this.userInput.nextLine();
     
-                if(message.toLowerCase().equals("quit")) {
+                if(message.equals("quit")) {
                     break;
                 }
     

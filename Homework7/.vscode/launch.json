@@ -6,11 +6,19 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch CaesarCipherServer",
+            "request": "launch",
+            "mainClass": "CaesarCipherServer",
+            "projectName": "Homework7_93d832b4",
+            "args": "7654"
+        },
+        {
+            "type": "java",
             "name": "Launch CaesarCipherClient",
             "request": "launch",
             "mainClass": "CaesarCipherClient",
             "projectName": "Homework7_93d832b4",
-            "args": "brooks.cs.calvin.edu 9876"
+            "args": "localhost 7654"
         }
     ]
 }
